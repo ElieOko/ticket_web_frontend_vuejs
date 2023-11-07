@@ -4,6 +4,9 @@ import type { ITicketRequestClose } from '@/composable/interface/ITicket';
 import type { ITransferStatus } from '@/composable/interface/ITransferStatus';
 import { token, useAxiosRequestWithToken } from '@/composable/service/common_http';
 import { ref, watchEffect } from 'vue';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
     const listTransferStatus    = ref<Array<ITransferStatus>>()
     const showMenu              = ref<Boolean>(false);
     const ticket                = ref<ITicketRequestClose>({
@@ -29,21 +32,28 @@ import { ref, watchEffect } from 'vue';
    const toggleNavbar =()=>{
      showMenu.value = !showMenu.value;
     }
+    const notify = (msg:string) => {
+      toast(msg, {
+        autoClose: 10000,
+      });
+    }
     const close_ticket = async ()=>{
         const data = JSON.parse(JSON.stringify(ticket.value));
         await useAxiosRequestWithToken(token).post(`${ApiRoutes.ticketClose}`,data).then(function (response) {
             // handle success
-            console.log(response)
+            notify(response.data.message);
+           // console.log(response)
             //useUserStore().setUser(response.data as IUser) 
             ///router.push("/")
         })
         .catch(function (error) {
             // handle error
-            console.log(error);
+            //console.log(error);
+            //notify(error as string)
         })
         .finally(function () {
             // always executed
-            alert("Elie Oko");
+           // notify("Chargement encours");
         });
     }
 </script>

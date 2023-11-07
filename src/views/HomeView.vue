@@ -1,18 +1,23 @@
 <script setup lang="ts">
+//import products from './appdata/products.json';
+import { process } from '@progress/kendo-data-query';
+import { Grid } from '@progress/kendo-vue-grid';
 import { ApiRoutes } from '@/composable/constant/endpoint';
 import type { ITicket } from '@/composable/interface/ITicket';
 import type { ITransferStatus } from '@/composable/interface/ITransferStatus';
 import type { IUser } from '@/composable/interface/IUser';
-import { token, useAxiosRequestWithToken } from '@/composable/service/common_http';
+import { productsData, token, useAxiosRequestWithToken } from '@/composable/service/common_http';
 import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
   const listTransferStatus = ref<Array<ITransferStatus>>()
+  const products           = ref<any>()
   const listTicket         = ref<Array<any>>()
-  const user = ref<IUser>(useUserStore().user) 
+  const user               = ref<IUser>(useUserStore().user) 
   const getAllTicket=(async()=>{
         await(useAxiosRequestWithToken(token).get(`${ApiRoutes.ticketList}`)
             .then(function (response) {
                 console.log("ticket",response.data)
+                products.value = response.data.tickets;
                 listTicket.value = response.data.tickets as Array<any>
             })
             .catch(function (error) {
@@ -22,11 +27,25 @@ import { ref } from 'vue';
                 //alert("Elie Oko");
             }));
     })
+
+    const columns = [
+    { field: 'TicketId',title:"N"},
+    { field:"CurrencyFId"},             
+    { field:"UserFId"},                 
+    { field:"TransferTypeFId"},         
+    { field:"TransferStatusFId"},
+    { field:"Amount"},                  
+    { field:"Phone"},             
+    { field:"Note"},
+    { field:'Name'},
+    { field:"Motif"},
+    { field:"DateCreated"},
+    { field:"ClotureDateCreated"}
+    ];
 </script>
 
 <template>
   <main>
-    {{ listTicket  }}
       <section class="w-full gap-4 bg-red-500">
         <div class="flex flex-row p-4">
           <div class="mr-2 ">
@@ -81,7 +100,7 @@ import { ref } from 'vue';
           </div>
         </div>
       </section>
-      <table class="w-full">
+      <!-- <table class="w-full">
         <thead>
           <tr>
             <td ></td>
@@ -187,8 +206,13 @@ import { ref } from 'vue';
           </tr>
          
         </tbody>
-      </table>
+      </table> -->
   </main>
+  <grid
+  :data-items="products"
+  :columns="columns"
+></grid>
+
 </template>
 
 <style>

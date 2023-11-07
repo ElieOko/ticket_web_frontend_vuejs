@@ -5,6 +5,8 @@ import {token, useAxiosRequestWithToken } from '@/composable/service/common_http
 import { useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const showLoad = ref<Boolean>(false);
 const router = useRouter();
@@ -12,6 +14,11 @@ const auth = ref<IUserAuth>({
     UserName:'',
     Password:''
   }); 
+  const notify = (msg:string) => {
+      toast(msg, {
+        autoClose: 10000,
+      });
+    }
 //ApiRoutes
 async function login() {
   showLoad.value = true;
@@ -24,11 +31,13 @@ async function login() {
   })
   .catch(function (error) {
     // handle error
+    showLoad.value = false
+    notify(error.response.data.message)
     console.log(error);
   })
   .finally(function () {
     // always executed
-    alert("Elie Oko");
+    //alert("Elie Oko");
   });
 }
 
@@ -59,8 +68,8 @@ async function login() {
                     <div class="text-center">
                      
                       <button  type="submit" class="inline-block w-[250px] px-6 py-3 mt-6 mb-2 font-bold text-center text-white  align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-2sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">
-                        <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
                         Connexion
+                        <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
                       </button>
                     </div>
                     <p class="mt-4 mb-0 leading-normal text-center text-sm"> <a href="#" class="font-bold text-blue-500 hover:text-blue-300 hover:underline">Identifiant / Mot de passe oublié?</a></p>

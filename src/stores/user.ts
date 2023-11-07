@@ -5,7 +5,7 @@ import type { IUser } from '@/composable/interface/IUser'
 export const useUserStore = defineStore('ticket', {
     state: () => {
         return{
-            user: {} as IUser
+            user : {} as IUser || null
         }
     }, 
     actions:{

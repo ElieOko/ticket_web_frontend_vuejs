@@ -2,16 +2,19 @@
 import { ApiRoutes } from '@/composable/constant/endpoint';
 import type { ICall } from '@/composable/interface/ICall';
 import type { ICounter } from '@/composable/interface/ICounter';
-import {useAxiosRequestWithToken } from '@/composable/service/common_http';
-import axios from 'axios';
-import { ref } from 'vue';
+import {token, useAxiosRequestWithToken } from '@/composable/service/common_http';
+import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
-import type { IUser } from '@/composable/interface/IUser';
 import { useUserStore } from '@/stores/user';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
-  const user = useUserStore().user
-  const listCounter = ref<Array<ICounter>>([]);
-  const token = user.token
+  const user        = useUserStore().user
+  const listCounter = ref<Array<ICounter>>();
+  const error       = ref<Boolean>(false);
+  const styleObj    = "bg-red-400 hidden";
+  const message     = ref<String>(""); 
+  // const token = user.token
   const router = useRouter();
   const callInstance = ref<ICall>({
     Ticket      : 0,
@@ -19,27 +22,49 @@ import { useUserStore } from '@/stores/user';
     Note        : "",
     UserFId     : user.UserId as unknown as number,
   })
+  const notify = (msg:string) => {
+      toast(msg, {
+        autoClose: 10000,
+      });
+    }
   const clear = ()=>{
     callInstance.value.Ticket     = 0;
     callInstance.value.CounterFId = 0;
     callInstance.value.Note       = "";
   }
+  watchEffect(async()=>{
+        await(useAxiosRequestWithToken(token).get(`${ApiRoutes.counterList}`)
+            .then(function (response) {
+                console.log("currency",response.data)
+                message.value ="Enregistrement réussi";
+                
+                listCounter.value = response.data.counters as Array<ICounter>
+            })
+            .catch(function (error) {
+              message.value = error
+              notify("Erreur")
+                console.log(error);
+            })
+            .finally(function () {
+                //alert("Elie Oko");
+            }))});
   const paiementEvent  = async () => {
     const data = JSON.parse(JSON.stringify(callInstance.value));
-    console.log("Call data ->",data)
-    await useAxiosRequestWithToken(token).post(`${ApiRoutes}`,data).then(function (response) {
+    console.log("Call data ->",data);
+
+    await useAxiosRequestWithToken(token).post(`${ApiRoutes.ticketCall}`,data).then(function (response) {
     // handle success
     //alert(response);
-      console.log(response)
-      router.push("/")
+      notify(response.data.message); 
+     // router.push("/")
     })
     .catch(function (error) {
     // handle error
-      console.log(error);
+      
     })
     .finally(function () {
       // always executed
-      alert("Elie Oko");
+     
     });
   }
 
@@ -55,18 +80,18 @@ import { useUserStore } from '@/stores/user';
                     </div>
                     </div>
                 </div>
-
                 <div class="flex-auto p-6">
                   <form role="form text-left" @submit.prevent ="">
                     <div class="mb-4">
                         <label>Numéro du ticket</label>
-                      <input type="number" v-model="callInstance.Ticket" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
+                      <input type="number" required v-model="callInstance.Ticket" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
                     </div>
+                    
                     <div class="mb-4 ">
                         <label>Guichet</label> 
                         <div class="relative">
-                            <select v-model="callInstance.CounterFId" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-green-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow">
-                                <option value="">Libre</option>
+                            <select v-model="callInstance.CounterFId" required class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-green-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow">
+                                <option v-for="(item,index) in listCounter" :key="index" :value="item.CounterId">{{ item.Name }}</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -75,7 +100,7 @@ import { useUserStore } from '@/stores/user';
                     </div>
                     <div class="mb-4">
                         <label>Remarques</label>
-                      <textarea v-model="callInstance.Note" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow"></textarea>
+                      <textarea v-model="callInstance.Note" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow"></textarea>
                     </div>
                     
                     <div class="flex flex-row gap-4">
@@ -98,12 +123,12 @@ import { useUserStore } from '@/stores/user';
                   <form role="form text-left">
                     <div class="mb-4">
                         <label>Message</label>
-                      <textarea class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow"></textarea>
+                      <textarea class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow"></textarea>
                     </div>
                     
                     <div class="flex flex-row gap-4">
                       <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">Envoyer</button>
-                      <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-800 to-gray-800 hover:border-gray-800   hover:text-white">Effacer</button>
+                      <button  @click="clear" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-800 to-gray-800 hover:border-gray-800   hover:text-white">Effacer</button>
                     </div>
                 </form>
                 </div>

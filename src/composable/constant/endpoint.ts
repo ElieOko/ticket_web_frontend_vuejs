@@ -14,4 +14,5 @@ export const ApiRoutes  = {
     ticketCreate            :   "ticket",
     ticketList              :   "ticket/all",
     ticketEdit              :   "ticket/edit",
+    ticketCall              :   "ticket/call"
 }

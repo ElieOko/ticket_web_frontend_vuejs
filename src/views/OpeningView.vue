@@ -6,6 +6,9 @@ import type { ITransferType } from '@/composable/interface/ITransferType';
 import { token, useAxiosRequestWithToken } from '@/composable/service/common_http';
 import { useUserStore } from '@/stores/user';
 import { ref, watchEffect } from 'vue';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
     const listCurrency = ref<Array<ICurrency>>();
     const listTypeTransfer = ref<Array<ITransferType>>();
     const user = useUserStore().user
