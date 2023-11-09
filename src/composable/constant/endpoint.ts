@@ -4,6 +4,7 @@ export const ApiRoutes  = {
     branchFilter            :   "branch/filter",
     counterList             :   "counter/all",
     counterCreate           :   "counter",  
+    counterUpdate           :   "counter/edit",  
     userLogin               :   "login",
     currencyList            :   "currency/all",
     userRegister            :   "register",
@@ -14,5 +15,6 @@ export const ApiRoutes  = {
     ticketCreate            :   "ticket",
     ticketList              :   "ticket/all",
     ticketEdit              :   "ticket/edit",
-    ticketCall              :   "ticket/call"
+    ticketCall              :   "ticket/call",
+    ticketFilter            :   "ticket/filter"
 }

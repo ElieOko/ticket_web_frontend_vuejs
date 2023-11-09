@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user';
-    const user = useUserStore().user;
+import { clearUser, getUser } from '@/stores/user';
+import { useRouter } from 'vue-router';
+    const router = useRouter();
+    const user = getUser();
     const logout =()=>{
-       // useUserStore().user = null;
+      clearUser()
+      router.push("/login");
     }
 </script>
 
@@ -29,8 +32,8 @@ import { useUserStore } from '@/stores/user';
             <router-link to="/open">Ouvrir ticket</router-link>
         </div>
         <div class="nav-links absolute right-0">
-            <a class="cursor-pointer">Déconnexion</a>
-            <a class="cursor-pointer">{{ user.UserName }}</a>
+            <a class="cursor-pointer" @click ="logout">Déconnexion</a>
+            <a class="cursor-pointer">{{ user?.UserName }}</a>
         </div>
        
   </div>

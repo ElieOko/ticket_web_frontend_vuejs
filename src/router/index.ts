@@ -5,7 +5,9 @@ import LoginView from '../views/LoginView.vue'
 import CallView from '../views/CallView.vue'
 import SettingView from '../views/SettingView.vue'
 import OpeningView from '../views/OpeningView.vue'
-import { useUserStore } from '@/stores/user'
+import OpeningScreenView from '../views/OpeningScreenView.vue'
+import ErrorView from '../views/ErrorView.vue'
+import { getUser, useUserStore } from '@/stores/user'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -44,9 +46,16 @@ const routes: RouteRecordRaw[] = [
     component: OpeningView,
     meta:{ requiresAuth: true , reload: true}
   },
+  {
+    path: '/open/screen',
+    name: 'openscreen',
+    component: OpeningScreenView,
+    meta:{ requiresAuth: true , reload: true}
+  },
   { 
     path: '/:catchAll(.*)',
-    component: OpeningView,
+    component:ErrorView,
+    meta: { layout: 'empty' }
   // component: 
    }
 ]
@@ -56,11 +65,13 @@ const router = createRouter({
   routes,
 })
 router.beforeEach((to, from, next) => {
-  const store = useUserStore()
-  if (to.meta.requiresAuth && !store.user) {
+  //const store = useTestStore()
+  if (to.meta.requiresAuth && !getUser()) {
     next('/login'); // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
   } else {
     next(); // Permettre l'accès à la page demandée
   }
 });
 export default router
+
+

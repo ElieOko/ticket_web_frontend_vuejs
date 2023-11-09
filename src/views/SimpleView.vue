@@ -9,6 +9,8 @@ import 'vue3-toastify/dist/index.css';
 
     const listTransferStatus    = ref<Array<ITransferStatus>>()
     const showMenu              = ref<Boolean>(false);
+    const showLoad              = ref<Boolean>(false);
+    const showClose             = ref<Boolean>(false);
     const ticket                = ref<ITicketRequestClose>({
                                     TicketId            : 0,
                                     Motif               : "",
@@ -38,18 +40,17 @@ import 'vue3-toastify/dist/index.css';
       });
     }
     const close_ticket = async ()=>{
+        showLoad.value = true
         const data = JSON.parse(JSON.stringify(ticket.value));
         await useAxiosRequestWithToken(token).post(`${ApiRoutes.ticketClose}`,data).then(function (response) {
-            // handle success
             notify(response.data.message);
-           // console.log(response)
-            //useUserStore().setUser(response.data as IUser) 
-            ///router.push("/")
+            showLoad.value = false;
         })
         .catch(function (error) {
             // handle error
             //console.log(error);
             //notify(error as string)
+            showLoad.value = false;
         })
         .finally(function () {
             // always executed
@@ -93,8 +94,12 @@ import 'vue3-toastify/dist/index.css';
                     </div>
                     
                     <div class="flex flex-row gap-4">
-                      <button  type="submit" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">Enregistrer</button>
-                      <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-400 to-red-400 hover:border-red-800   hover:text-white">Fermer et Payer</button>
+                      <button  type="submit" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">
+                        Enregistrer <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+                    </button>
+                      <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-400 to-red-400 hover:border-red-800   hover:text-white">
+                        Fermer et Payer <svg v-if="showClose" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+                    </button>
                     </div>
                 </form>
                 </div>
@@ -108,4 +113,15 @@ import 'vue3-toastify/dist/index.css';
     .card-head{
         background-color: rgba(0,0,0,.03);
     }
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>

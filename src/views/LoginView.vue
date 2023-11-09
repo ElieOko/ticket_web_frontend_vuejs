@@ -2,7 +2,7 @@
 import { ApiRoutes } from '@/composable/constant/endpoint';
 import type { IUser, IUserAuth } from '@/composable/interface/IUser';
 import {token, useAxiosRequestWithToken } from '@/composable/service/common_http';
-import { useUserStore } from '@/stores/user';
+import { setUser, useUserStore } from '@/stores/user';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
@@ -26,7 +26,8 @@ async function login() {
   await useAxiosRequestWithToken(token).post(`${ApiRoutes.userLogin}`,data).then(function (response) {
     // handle success
     console.log(response)
-    useUserStore().setUser(response.data as IUser) 
+    setUser(response.data as IUser)
+    //useUserStore().setUser(response.data as IUser) 
     router.push("/")
   })
   .catch(function (error) {

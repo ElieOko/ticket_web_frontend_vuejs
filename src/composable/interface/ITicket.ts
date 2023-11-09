@@ -1,3 +1,8 @@
+import type { ICurrency } from "./ICurrency"
+import type { ITransferStatus } from "./ITransferStatus"
+import type { ITransferType } from "./ITransferType"
+import type { IUser } from "./IUser"
+
 export interface ITicket{
     TicketId?               :   number
     Amount                  :   number
@@ -16,12 +21,23 @@ export interface ITicket{
     DureeP?                 :   string
     ClotureDateCreated?     :   string
     DateCreated?            :   string
+    user?                   :   IUser
+    currency?               :   ICurrency
+    transfer_type?           :   ITransferType
+    transferStatus?         :   ITransferStatus
 }
 export interface ITicketRequestClose{
     TicketId                : number,
     Motif                   : string,
     TransferStatusFId       : number,
     ClotureDateCreated      : string,
+}
+
+export interface ITicketFilter{
+    TransferTypeFId     : number,
+    TransferStatusFId   : number,
+    dateTo              : string,
+    dateFrom            : string,
 }
         
  

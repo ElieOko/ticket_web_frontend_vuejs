@@ -4,11 +4,13 @@ import type { ICurrency } from '@/composable/interface/ICurrency';
 import type { ITicket } from '@/composable/interface/ITicket';
 import type { ITransferType } from '@/composable/interface/ITransferType';
 import { token, useAxiosRequestWithToken } from '@/composable/service/common_http';
-import { useUserStore } from '@/stores/user';
+import { setTicket, useUserStore } from '@/stores/user';
 import { ref, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
+    const router = useRouter();
     const listCurrency = ref<Array<ICurrency>>();
     const listTypeTransfer = ref<Array<ITransferType>>();
     const user = useUserStore().user
@@ -26,19 +28,28 @@ import 'vue3-toastify/dist/index.css';
             const data = JSON.parse(JSON.stringify(ticket.value))
             await useAxiosRequestWithToken(token).post(`${ApiRoutes.ticketCreate}`,data).then(function (response) {
             // handle success
-            //alert(response);
+            notify(response.data.message);
             console.log(response)
-            //router.push("/")
+            if(response.data.message == "Enregistrement réussie avec succès"){
+                setTicket(response.data.ticket[0])
+                router.push({path:"/open/screen"});
+            }
+  
             })
             .catch(function (error) {
             // handle error
             console.log(error);
+            notify("Erreur detecter au niveau du serveur")
             })
             .finally(function () {
-            // always executed
-            alert("Elie Oko");
+            // always executed      
             });
         }
+        const notify = (msg:string) => {
+      toast(msg, {
+        autoClose: 10000,
+      });
+    }
     watchEffect(async()=>{
         await(useAxiosRequestWithToken(token).get(`${ApiRoutes.currencyList}`)
             .then(function (response) {

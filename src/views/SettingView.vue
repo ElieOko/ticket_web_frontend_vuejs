@@ -5,18 +5,24 @@ import { token, useAxiosRequestWithToken } from '@/composable/service/common_htt
 import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-
     const counterList           = ref<Array<ICounter>>()
     const counters              = ref<ICounter>()   
     const showUpdate            = ref<Boolean>(false)
+    const showLoad              = ref<Boolean>(false)
+    const showUpgrade           = ref<Boolean>(false)
     const counterRequest        = ref<ICounter>({
         Name:"",
         BranchFId:0
-    }) 
+    })
+    const counterRequestStore   = ref<ICounter>({
+        Name:"",
+        BranchFId:1
+    })  
     const callStateButton = ()=>{
         showUpdate.value = !showUpdate.value
     }
-    watchEffect(async()=>{
+    const getAllCounter =
+        async()=>{
         await(useAxiosRequestWithToken(token).get(`${ApiRoutes.counterList}`)
             .then(function (response) {
                 console.log("currency",response.data)
@@ -27,14 +33,21 @@ import 'vue3-toastify/dist/index.css';
             })
             .finally(function () {
                 //alert("Elie Oko");
-            }))});
+            }))}
+  
+    watchEffect( async()=>{
+            getAllCounter()
+        }    
+    );
     const selectCounter = (counter:ICounter)=>{
         counters.value  = counter;
     }
-    const store_counter = async ()=>{
+    const store_update = async (id : number)=>{
+        showUpgrade.value = true
         const data = JSON.parse(JSON.stringify(counterRequest.value));
-        await useAxiosRequestWithToken(token).post(`${ApiRoutes.counterCreate}`,data).then(function (response) {
+        await useAxiosRequestWithToken(token).post(`${ApiRoutes.counterUpdate}/${id}`,data).then(function (response) {
             console.log(response)
+            getAllCounter()
         })
         .catch(function (error) {
             // handle error
@@ -42,7 +55,23 @@ import 'vue3-toastify/dist/index.css';
         })
         .finally(function () {
             // always executed
-           
+            showUpgrade.value = false
+        });
+    }
+    const store_counter = async ()=>{
+        showLoad.value = true
+        const data = JSON.parse(JSON.stringify(counterRequestStore.value));
+        await useAxiosRequestWithToken(token).post(`${ApiRoutes.counterCreate}`,data).then(function (response) {
+            console.log(response)
+            getAllCounter()
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        })
+        .finally(function () {
+            // always executed
+            showLoad.value = false
         });
     }
 </script>
@@ -79,16 +108,19 @@ import 'vue3-toastify/dist/index.css';
                 <div class="flex-auto p-6">
                   <form role="form text-left">
                     <div class="mb-4">
+                   
                         <label class="mr-4">Nom</label>
-                      <input type="text" required :value ="counters?.Name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft  w-full appearance-none rounded-lg border border-solid border-gray-300 bg-gray-300 bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
+                      <input type="text" v-model="counterRequest.Name" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft  w-full appearance-none rounded-lg border border-solid border-gray-300 bg-gray-300 bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
                     </div> 
                     <div class="flex flex-row gap-4" v-if="!showUpdate">
                       <button  @click="callStateButton" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-black   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-yellow-300 to-yellow-200   hover:text-white">Modifier</button>
                       <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-500 to-red-500    hover:text-white">Supprimer</button>
                     </div>
                     <div class="flex flex-row gap-4" v-else>
-                      <button  @click="callStateButton" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-black   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-blue-500 hover:text-white">Enregistrer</button>
-                      <button  @click="callStateButton" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-500 to-red-500    hover:text-white">Annuler</button>
+                      <button  @click="store_update(counters?.CounterId as number)" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-black   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-blue-800 hover:text-white">
+                        Enregistrer
+                      </button>
+                      <button @click="callStateButton" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-500 to-red-500    hover:text-white">Annuler</button>
                     </div>
 
                 </form>
@@ -104,13 +136,15 @@ import 'vue3-toastify/dist/index.css';
                 </div>
 
                 <div class="flex-auto p-6">
-                  <form role="form text-left" @submit:prevent="store_counter" >
+                  <form role="form text-left" >
                     <div class="mb-4 ">
                         <label  class="mr-4">Nom</label>
-                      <input type="text" v-model="counterRequest.Name" placeholder="name" class="text-sm  focus:shadow-soft-primary-outline leading-5.6 ease-soft w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
+                      <input type="text" required v-model="counterRequestStore.Name" placeholder="name" class="text-sm  focus:shadow-soft-primary-outline leading-5.6 ease-soft w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
                     </div>
                     <div class="flex flex-row gap-4">
-                      <button type="submit" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-blue-400 to-blue-400 hover:border-blue-800   hover:text-white">Enregistrer</button>
+                      <button type="button" @click="store_counter" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-blue-400 to-blue-400 hover:border-blue-800   hover:text-white">
+                        Enregistrer <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+                      </button>
                     </div>
                 </form>
                 </div>
@@ -118,3 +152,16 @@ import 'vue3-toastify/dist/index.css';
     </form>
 
 </template>
+<style>
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

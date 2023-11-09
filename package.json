@@ -20,6 +20,7 @@
     "@progress/kendo-vue-dateinputs": "^4.0.0",
     "@progress/kendo-vue-dialogs": "^4.0.0",
     "@progress/kendo-vue-dropdowns": "^4.0.0",
+    "@progress/kendo-vue-excel-export": "^4.0.0",
     "@progress/kendo-vue-grid": "^4.0.0",
     "@progress/kendo-vue-indicators": "^4.0.0",
     "@progress/kendo-vue-inputs": "^4.0.0",

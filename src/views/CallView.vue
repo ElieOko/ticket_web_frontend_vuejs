@@ -9,11 +9,13 @@ import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
-  const user        = useUserStore().user
-  const listCounter = ref<Array<ICounter>>();
-  const error       = ref<Boolean>(false);
-  const styleObj    = "bg-red-400 hidden";
-  const message     = ref<String>(""); 
+  const user            = useUserStore().user
+  const listCounter     = ref<Array<ICounter>>();
+  const showLoad        = ref<Boolean>(false);
+  const showPaiement    = ref<Boolean>(false);
+  const error           = ref<Boolean>(false);
+  const styleObj        = "bg-red-400 hidden";
+  const message         = ref<String>(""); 
   // const token = user.token
   const router = useRouter();
   const callInstance = ref<ICall>({
@@ -49,18 +51,20 @@ import 'vue3-toastify/dist/index.css';
                 //alert("Elie Oko");
             }))});
   const paiementEvent  = async () => {
+    showLoad.value = true;
     const data = JSON.parse(JSON.stringify(callInstance.value));
     console.log("Call data ->",data);
 
     await useAxiosRequestWithToken(token).post(`${ApiRoutes.ticketCall}`,data).then(function (response) {
     // handle success
     //alert(response);
+      showLoad.value = false;
       notify(response.data.message); 
      // router.push("/")
     })
     .catch(function (error) {
     // handle error
-      
+      showLoad.value = false;
     })
     .finally(function () {
       // always executed
@@ -104,8 +108,12 @@ import 'vue3-toastify/dist/index.css';
                     </div>
                     
                     <div class="flex flex-row gap-4">
-                      <button  @click="paiementEvent" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">Appeler</button>
-                      <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-black   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-yellow-200 to-yellow-200    hover:text-white">Paiement</button>
+                      <button  @click="paiementEvent" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">
+                        Appeler <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+                      </button>
+                      <button @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-black   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-yellow-200 to-yellow-200 hover:text-white">
+                        Paiement <svg v-if="showPaiement" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+                      </button>
                     </div>
                 </form>
                 </div>
@@ -135,3 +143,16 @@ import 'vue3-toastify/dist/index.css';
         </div> 
     </div>
 </template>
+<style>
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
