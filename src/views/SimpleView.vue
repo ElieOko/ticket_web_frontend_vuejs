@@ -3,7 +3,7 @@ import { ApiRoutes } from '@/composable/constant/endpoint';
 import type { ITicketRequestClose } from '@/composable/interface/ITicket';
 import type { ITransferStatus } from '@/composable/interface/ITransferStatus';
 import { token, useAxiosRequestWithToken } from '@/composable/service/common_http';
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
@@ -34,6 +34,9 @@ import 'vue3-toastify/dist/index.css';
    const toggleNavbar =()=>{
      showMenu.value = !showMenu.value;
     }
+    const errorTicket = computed(() => {
+      return ticket.value.TicketId === 0 ? "Le numero du ticket 0 n'est pas valide" : "";
+    });
     const notify = (msg:string) => {
       toast(msg, {
         autoClose: 10000,
@@ -41,20 +44,23 @@ import 'vue3-toastify/dist/index.css';
     }
     const close_ticket = async ()=>{
         showLoad.value = true
+        if(ticket.value.TicketId == 0){
+            alert("Aucun ticket n'est valide avec le numero 0");
+            showLoad.value = false;
+            return 
+        }
         const data = JSON.parse(JSON.stringify(ticket.value));
         await useAxiosRequestWithToken(token).post(`${ApiRoutes.ticketClose}`,data).then(function (response) {
             notify(response.data.message);
-            showLoad.value = false;
         })
         .catch(function (error) {
             // handle error
-            //console.log(error);
-            //notify(error as string)
-            showLoad.value = false;
+            console.log(error);
+            notify("Erreur au niveau du serveur")
         })
         .finally(function () {
             // always executed
-           // notify("Chargement encours");
+           showLoad.value = false;
         });
     }
 </script>
@@ -75,6 +81,9 @@ import 'vue3-toastify/dist/index.css';
                     <div class="mb-4">
                         <label>Numéro du ticket</label>
                       <input type="number" v-model="ticket.TicketId" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
+                      <div class="text-red-500 ml-4" v-if="errorTicket">
+                            {{ errorTicket }}
+                      </div>
                     </div>
                     <div class="mb-4 ">
                         <label>Etat</label> 
@@ -97,9 +106,9 @@ import 'vue3-toastify/dist/index.css';
                       <button  type="submit" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">
                         Enregistrer <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
                     </button>
-                      <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-400 to-red-400 hover:border-red-800   hover:text-white">
+                      <!-- <button  @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-400 to-red-400 hover:border-red-800   hover:text-white">
                         Fermer et Payer <svg v-if="showClose" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
-                    </button>
+                    </button> -->
                     </div>
                 </form>
                 </div>

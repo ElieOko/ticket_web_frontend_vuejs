@@ -3,8 +3,7 @@ import { ApiRoutes } from '@/composable/constant/endpoint';
 import type { ICall } from '@/composable/interface/ICall';
 import type { ICounter } from '@/composable/interface/ICounter';
 import {token, useAxiosRequestWithToken } from '@/composable/service/common_http';
-import { ref, watchEffect } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, watchEffect } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -13,11 +12,8 @@ import 'vue3-toastify/dist/index.css';
   const listCounter     = ref<Array<ICounter>>();
   const showLoad        = ref<Boolean>(false);
   const showPaiement    = ref<Boolean>(false);
-  const error           = ref<Boolean>(false);
-  const styleObj        = "bg-red-400 hidden";
   const message         = ref<String>(""); 
   // const token = user.token
-  const router = useRouter();
   const callInstance = ref<ICall>({
     Ticket      : 0,
     CounterFId  : 0,
@@ -34,6 +30,9 @@ import 'vue3-toastify/dist/index.css';
     callInstance.value.CounterFId = 0;
     callInstance.value.Note       = "";
   }
+  const errorTicket = computed(() => {
+      return callInstance.value.Ticket === 0 ? "Le numero du ticket 0 n'est pas valide" : "";
+    });
   watchEffect(async()=>{
         await(useAxiosRequestWithToken(token).get(`${ApiRoutes.counterList}`)
             .then(function (response) {
@@ -52,27 +51,26 @@ import 'vue3-toastify/dist/index.css';
             }))});
   const paiementEvent  = async () => {
     showLoad.value = true;
+    if(callInstance.value.Ticket == 0){
+      alert("Aucun ticket n'est valide avec le numero 0");
+      showLoad.value = false;
+      return
+    }
     const data = JSON.parse(JSON.stringify(callInstance.value));
     console.log("Call data ->",data);
-
     await useAxiosRequestWithToken(token).post(`${ApiRoutes.ticketCall}`,data).then(function (response) {
     // handle success
-    //alert(response);
-      showLoad.value = false;
       notify(response.data.message); 
-     // router.push("/")
     })
     .catch(function (error) {
     // handle error
-      showLoad.value = false;
+    notify("Erreur au niveau du serveur"); 
     })
     .finally(function () {
       // always executed
-     
+      showLoad.value = false;
     });
   }
-
-  
 </script>
 <template>
     <div class="relative mx-auto max-w-[740px] px-4 top-[75px]  md:flex-0 shrink-0 ">
@@ -88,7 +86,10 @@ import 'vue3-toastify/dist/index.css';
                   <form role="form text-left" @submit.prevent ="">
                     <div class="mb-4">
                         <label>Numéro du ticket</label>
-                      <input type="number" required v-model="callInstance.Ticket" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
+                        <input type="number" required v-model="callInstance.Ticket" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" />
+                        <div class="text-red-500 ml-4" v-if="errorTicket">
+                            {{ errorTicket }}
+                        </div>
                     </div>
                     
                     <div class="mb-4 ">
@@ -111,9 +112,9 @@ import 'vue3-toastify/dist/index.css';
                       <button  @click="paiementEvent" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">
                         Appeler <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
                       </button>
-                      <button @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-black   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-yellow-200 to-yellow-200 hover:text-white">
+                      <!-- <button @click="" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-black   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-yellow-200 to-yellow-200 hover:text-white">
                         Paiement <svg v-if="showPaiement" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
-                      </button>
+                      </button> -->
                     </div>
                 </form>
                 </div>

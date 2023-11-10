@@ -37,8 +37,8 @@ import { getCurrentDate } from '@/composable/service/module_init';
       }  
   const columns = [
     { field: 'TicketId',title:"N",editable: false},
-    { field:'Name',filterable: false,filter:'text',editable: false},
-    { field:"Amount", filterable: false,filter: "numeric",editor: "numeric"},                  
+    { field:'Name',filter:'text',editable: false},
+    { field:"Amount",filter: "numeric",editor: "numeric"},                  
     { field:"Phone", editable: true,filter:'text',editor: "text"}, 
     { field:"user.UserName",title:"Username",editable: false},
     { field:"DateCreated", title:"DateD",filter: "date",editable: false},
@@ -245,7 +245,7 @@ import { getCurrentDate } from '@/composable/service/module_init';
     @pagechange="pageChangeHandler"
     :data-items="ticket"
     :total ="ticket.length"
-    :columns="columns"
+    :columns="columns as any"
     :edit-field="'inEdit'"
     @cellclick="cellClick"
     @itemchange="itemChange"

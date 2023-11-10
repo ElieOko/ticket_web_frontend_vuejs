@@ -86,15 +86,15 @@ import 'vue3-toastify/dist/index.css';
                     </div>
                     </div>
                 </div>
-                    <div class="p-6">
-                        <table class="appearance-none rounded-lg border border-solid">
-                            <tbody>
-                                <tr class="" v-for="(item,index) in counterList">
-                                    <td @click="selectCounter(item)" class="border border-gray-400 w-[400px] rounded-sm h-12 cursor-pointer bg-white hover:bg-[#f8f9fa]">{{ item.Name }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div> 
+                <div class="p-6">
+                    <table class="appearance-none rounded-lg border border-solid">
+                        <tbody>
+                            <tr class="" v-for="(item,index) in counterList">
+                                <td @click="selectCounter(item)" class="border border-gray-400 w-[400px] rounded-sm h-12 cursor-pointer bg-white hover:bg-[#f8f9fa]">{{ item.Name }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div> 
         </div>
         <div class="relative z-0 flex flex-col h-64 w-full bg-[#f8f9fa] min-w-0 break-words border-0 shadow-soft-xl  bg-clip-border">
                 <div class="relative py-4  card-head h-16 bg-gray-400  text-black">
@@ -122,7 +122,6 @@ import 'vue3-toastify/dist/index.css';
                       </button>
                       <button @click="callStateButton" type="button" class="inline-block w-[150px] px-2 py-2 mt-6 mb-2 font-bold text-center text-white   transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-red-500 to-red-500    hover:text-white">Annuler</button>
                     </div>
-
                 </form>
                 </div>
         </div>

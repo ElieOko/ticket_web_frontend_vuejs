@@ -9,6 +9,7 @@ import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 const showLoad = ref<Boolean>(false);
+const showPassword = ref<Boolean>(false);
 const router = useRouter();
 const auth = ref<IUserAuth>({
     UserName:'',
@@ -22,23 +23,28 @@ const auth = ref<IUserAuth>({
 //ApiRoutes
 async function login() {
   showLoad.value = true;
+  if(auth.value.UserName){
+
+  }
+  if(auth.value.Password){
+
+  }
   const data = JSON.parse(JSON.stringify(auth.value));
   await useAxiosRequestWithToken(token).post(`${ApiRoutes.userLogin}`,data).then(function (response) {
     // handle success
     console.log(response)
     setUser(response.data as IUser)
-    //useUserStore().setUser(response.data as IUser) 
     router.push("/")
   })
   .catch(function (error) {
     // handle error
-    showLoad.value = false
     notify(error.response.data.message)
     console.log(error);
   })
   .finally(function () {
     // always executed
     //alert("Elie Oko");
+    showLoad.value = false;
   });
 }
 
@@ -63,9 +69,9 @@ async function login() {
                       <input type="text" required v-model="auth.UserName" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Saisissez l'identifiant" aria-label="Email" aria-describedby="email-addon" />
                     </div>
                     <div class="mb-4">
-                      <input type="password" required v-model="auth.Password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Saisissez le mot de passe" aria-label="Password" aria-describedby="password-addon" />
+                      <input :type="showPassword ? 'text':'password'" required v-model="auth.Password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-4 px-3 font-normal text-gray-700 transition-all focus:border-blue-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Saisissez le mot de passe" aria-label="Password" aria-describedby="password-addon" />
                     </div>
-                    <input type="checkbox"/> <label>Afficher le mot de passe</label>
+                    <input v-model="showPassword" type="checkbox"/> <label>Afficher le mot de passe</label>
                     <div class="text-center">
                      
                       <button  type="submit" class="inline-block w-[250px] px-6 py-3 mt-6 mb-2 font-bold text-center text-white  align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-2sm ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-400 to-slate-400 hover:border-gray-800   hover:text-white">
