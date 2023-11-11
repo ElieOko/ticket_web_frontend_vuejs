@@ -1,3 +1,4 @@
+import { getUser } from "@/stores/user";
 import axios, { type AxiosInstance } from "axios";
 //https://www.jstoolset.com/jwt
 export const useAxiosRequestWithToken = (token?:string) : AxiosInstance  =>{
@@ -6,7 +7,7 @@ export const useAxiosRequestWithToken = (token?:string) : AxiosInstance  =>{
         headers   : {
           "Content-type"      :   "application/json",
           "X-Requested-With"  :   "XMLHttpRequest",
-          "Authorization"     :   `Bearer ${token}`
+          "Authorization"     :   `Bearer ${getUser()?.token as string}`
         },
       })
       return useAxios

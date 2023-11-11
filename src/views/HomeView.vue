@@ -8,7 +8,7 @@ import { ApiRoutes } from '@/composable/constant/endpoint';
 import type { ITicket, ITicketFilter } from '@/composable/interface/ITicket';
 import type { ITransferStatus } from '@/composable/interface/ITransferStatus';
 import { productsData, token, useAxiosRequestWithToken } from '@/composable/service/common_http';
-import { useUserStore } from '@/stores/user';
+import { getTicket, getUser, useUserStore } from '@/stores/user';
 import { computed, ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -56,7 +56,7 @@ import { getCurrentDate } from '@/composable/service/module_init';
     }
     watchEffect(async () =>{
         await(
-            useAxiosRequestWithToken(token).get(`${ApiRoutes.transferStatus}`)
+            useAxiosRequestWithToken(getUser()?.token as string).get(`${ApiRoutes.transferStatus}`)
             .then(function (response) {
                 listTransferStatus.value = response.data.transferStatus as Array<ITransferStatus>
             })
@@ -66,7 +66,7 @@ import { getCurrentDate } from '@/composable/service/module_init';
             .finally(function () {
             })
         );
-        await(useAxiosRequestWithToken(token).get(`${ApiRoutes.transferTypeList}`)
+        await(useAxiosRequestWithToken(getUser()?.token).get(`${ApiRoutes.transferTypeList}`)
             .then(function (response) {
                 console.log("transferType",response.data)
                 listTypeTransfer.value = response.data.transferTypes as Array<ITransferType>
@@ -84,7 +84,7 @@ import { getCurrentDate } from '@/composable/service/module_init';
     }
   const filter = ref<CompositeFilterDescriptor>({logic: "and", filters: []});
   const getAllTicket=(async()=>{
-        await(useAxiosRequestWithToken(token).get(`${ApiRoutes.ticketList}`)
+        await(useAxiosRequestWithToken(getUser()?.token).get(`${ApiRoutes.ticketList}`)
             .then(function (response) {
                 products.value = response.data.tickets;
                 listTicket.value = response.data.tickets as Array<any>
