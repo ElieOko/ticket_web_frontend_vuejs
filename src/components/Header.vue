@@ -30,11 +30,11 @@ import { useRouter } from 'vue-router';
             <router-link to="/call">Appels</router-link>
             <router-link to="/setting">Paramètres</router-link>
             <router-link to="/open">Ouvrir ticket</router-link>
+            
+            <a class="cursor-pointer absolute right-24" @click ="logout">Déconnexion</a>
+            <a class="cursor-pointer absolute right-0">{{ user?.UserName }}</a>
         </div>
-        <div class="nav-links absolute right-0">
-            <a class="cursor-pointer" @click ="logout">Déconnexion</a>
-            <a class="cursor-pointer">{{ user?.UserName }}</a>
-        </div>
+       
        
   </div>
 </template>
