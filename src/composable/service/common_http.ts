@@ -1,19 +1,19 @@
 import { getUser } from "@/stores/user";
 import axios, { type AxiosInstance } from "axios";
 //https://www.jstoolset.com/jwt
-export const useAxiosRequestWithToken = (token?:string) : AxiosInstance  =>{
+export const useAxiosRequestWithToken = (tokens?:string) : AxiosInstance  =>{
     const useAxios: AxiosInstance = axios.create({
         baseURL               : "http://213.136.74.84:50/api/",
         headers   : {
           "Content-type"      :   "application/json",
           "X-Requested-With"  :   "XMLHttpRequest",
-          "Authorization"     :   `Bearer ${getUser()?.token as string}`
+          "Authorization"     :   `Bearer ${token}`
         },
       })
       return useAxios
 }
 
-export const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3JlZ2lzdGVyIiwiaWF0IjoxNjk4ODQzNjEwLCJleHAiOjE3MDA2NTgwMTAsIm5iZiI6MTY5ODg0MzYxMCwianRpIjoibmFXeHQ0VWlFYW0xeDBuYyIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.YM-CrzHoZ7Bk15bXK5db5WAm-vW_UZPjJ93rzSzmwLM"
+export const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMjEzLjEzNi43NC44NDo1MC9hcGkvcmVnaXN0ZXIiLCJpYXQiOjE2OTk2ODkwOTksImV4cCI6MTcwMTUwMzQ5OSwibmJmIjoxNjk5Njg5MDk5LCJqdGkiOiJyeXdMTG5PZE04ZUtNbWRqIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.9WJWcUgoKJDrN_laSgGIXsRavo_d1l5HxcgAEe36GK4"
 
 const categories = [
   { "CategoryID": 1, "CategoryName": "Beverages" },
